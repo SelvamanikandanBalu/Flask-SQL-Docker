@@ -1,0 +1,23 @@
+services:
+  db:
+    image: mysql:8
+    container_name: mydb
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: mydatabase
+      MYSQL_USER: flaskuser
+      MYSQL_PASSWORD: flaskpass
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-proot"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  web:
+    build: .
+    container_name: myflaskapp
+    depends_on:
+      db:
+        condition: service_healthy   # ✅ wait until MySQL passes healthcheck
+    ports:
+      - "5000:5000"
